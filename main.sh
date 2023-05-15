@@ -20,7 +20,6 @@ if [ ! -f ./flag.txt ]; then
     # Install Rust
     echo "Installing Rust..."
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
-    source "$HOME/.cargo/env"
 
     # Configure Git with your information
     echo "Configuring Git..."
@@ -56,7 +55,18 @@ if [ ! -f ./flag.txt ]; then
     echo "/usr/bin/fish" | sudo tee -a /etc/shells
     chsh -s /usr/bin/fish
 
-    echo "Installation and GitHub authentication completed successfully!"
+    # Set cargo bin path to Fish shell
+    echo "Adding cargo path to fish config"
+    fish_config="/root/.config/fish/config.fish"
+    config_dir=$(dirname "$fish_config")
+    mkdir -p "$config_dir"
+    # Check if the fish.config file exists
+    if [ ! -f "$fish_config" ]; then
+        # Create the fish.config file if it doesn't exist
+        touch "$fish_config"
+    fi
+    echo 'set PATH $PATH /root/.cargo/bin' >> "$fish_config"
+    # echo 'set PATH $PATH /root/.rustup/bin' >> "$fish_config"
 
 
     # Create flag.txt
@@ -102,5 +112,5 @@ while true; do
   fi
   
  
-  sleep 2
+  sleep 60
 done
