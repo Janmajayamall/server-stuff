@@ -17,9 +17,14 @@ if [ ! -f ./flag.txt ]; then
     echo "Installing additional utilities..."
     sudo apt-get install -y curl wget unzip git bc
 
-    # Install Rust
+    # Install Rust for all users
     echo "Installing Rust..."
+    export RUSTUP_HOME=/usr/local/rustup
+    export CARGO_HOME=/usr/local/cargo
+    export PATH=/usr/local/cargo/bin:$PATH
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --default-toolchain stable
+    source "/usr/local/cargo/env"
+    rustup default stable # FIXME: this does not seem to work!
 
     # Configure Git with your information
     echo "Configuring Git..."
@@ -46,27 +51,28 @@ if [ ! -f ./flag.txt ]; then
     # echo "Storing GitHub token in the credentials file..."
     # echo "https://github.com:${token}@github.com" > ~/.git-credentials
 
-    # Install Fish shell
+    # Install Fish shell and configure it for entire system
     echo "Installing Fish shell..."
     sudo apt-get install -y fish
-
+   
     # Set Fish shell as the default shell
     echo "Setting Fish shell as the default shell..."
     echo "/usr/bin/fish" | sudo tee -a /etc/shells
-    chsh -s /usr/bin/fish
+    chsh -s /bin/fish 
+    sudo chsh -s /bin/fish janmajayamall # make default for a user
 
     # Set cargo bin path to Fish shell
     echo "Adding cargo path to fish config"
-    fish_config="/root/.config/fish/config.fish"
+    fish_config="/etc/fish/config.fish"
     config_dir=$(dirname "$fish_config")
     mkdir -p "$config_dir"
+
     # Check if the fish.config file exists
     if [ ! -f "$fish_config" ]; then
         # Create the fish.config file if it doesn't exist
         touch "$fish_config"
     fi
-    echo 'set PATH $PATH /root/.cargo/bin' >> "$fish_config"
-    # echo 'set PATH $PATH /root/.rustup/bin' >> "$fish_config"
+    echo "set PATH $PATH /usr/local/cargo/bin" >> "$fish_config"
 
 
     # Create flag.txt
